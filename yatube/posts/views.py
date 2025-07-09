@@ -44,7 +44,13 @@ def group_posts(request, slug):  # Принимаем в аргументе пе
 
 def profile(request, username):
     author = get_object_or_404(User, username=username)  # Берем автора по контексту запроса.
-    following = Follow.objects.filter(user=request.user, author=author).exists()  # Проверяем наличие подписки на автора.
+    # Не авторизованному пользователю всегда предлагаем подписаться.
+    # Тогда при нажатии на подписку сработает редирект, требующий регистрацию и выкидывающий предложение зарег-ся.
+    following = False
+
+    #  Если зашел авторизованный пользователь - проверяем подписку
+    if request.user.is_authenticated:
+        following = Follow.objects.filter(user=request.user, author=author).exists()  # Проверяем наличие подписки.
 
     posts_count = Post.objects.filter(author=author).count()
     post_list = Post.objects.all().filter(author=author)
@@ -53,7 +59,7 @@ def profile(request, username):
         'profile': author,
         'page_obj': page_obj,
         'posts_count': posts_count,
-        'following' : following,
+        'following' : following,  #  передаем для кнопки
     })
 
 def post_detail(request, post_id):
