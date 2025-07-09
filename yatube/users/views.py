@@ -1,0 +1,10 @@
+from django.views.generic import CreateView
+from django.urls import reverse_lazy
+
+from .forms import CreationForm
+
+
+class SignUp(CreateView):  #Кастомизация Generic View: привязка кастомной формы.
+    form_class = CreationForm
+    success_url = reverse_lazy('posts:index')
+    template_name = 'users/signup.html'
